@@ -1,6 +1,6 @@
 {
   "name": "webp-png-converter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "WebP / PNG image converter",
   "main": "./out/main/index.js",
   "author": "Yuma Shintani",

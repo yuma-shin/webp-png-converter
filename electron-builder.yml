@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: webp-png-converter
+productName: WebP - PNG Converter
 directories:
   buildResources: build
 files:

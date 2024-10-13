@@ -103,7 +103,7 @@ const convertFiles = async (folderPath, conversionType, removeFile) => {
     const tasks = files.map(async (file) => {
       const filePath = join(folderPath, file)
       if (fs.statSync(filePath).isDirectory()) {
-        return convertFiles(filePath, conversionType) // サブフォルダも再帰的に処理
+        return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
       } else {
         if (conversionType === 'webp-to-png' && extname(file) === '.webp') {
           const outputFilePath = join(folderPath + '/png', basename(file, '.webp') + '.png')
@@ -119,7 +119,7 @@ const convertFiles = async (folderPath, conversionType, removeFile) => {
     const tasks = files.map(async (file) => {
       const filePath = join(folderPath, file)
       if (fs.statSync(filePath).isDirectory()) {
-        return convertFiles(filePath, conversionType) // サブフォルダも再帰的に処理
+        return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
       } else {
         if (conversionType === 'webp-to-png' && extname(file) === '.webp') {
           const outputFilePath = join(folderPath, basename(file, '.webp') + '.png')
