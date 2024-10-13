@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Typography, TextField, Box, Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl } from '@mui/material';
 
+import './I18n'
+
+
 const App = () => {
   const [folderPath, setFolderPath] = useState('');
   const [message, setMessage] = useState('');
