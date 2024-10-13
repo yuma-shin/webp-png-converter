@@ -54,15 +54,15 @@ const App = () => {
         </Typography>
 
         <Button variant="contained" color="primary" onClick={selectFolder} disabled={isLoading}>
-          { t('Select-Folder') }
+          { t('Folder.Select') }
         </Button>
 
         <Box my={2}>
           <TextField
             fullWidth
             variant="outlined"
-            label={ t('Folder-Path') }
-            value={folderPath ?? 'フォルダが選択されていません' }
+            label={ t('Folder.Label') }
+            value={folderPath ?? t('Folder.Placeholder') }
             aria-readonly = 'true'
             aria-disabled = 'true'
             disabled = { true }
@@ -72,7 +72,7 @@ const App = () => {
         <Box my={2}>
           <FormControl>
             <FormLabel component="legend">
-              { t('Select-Type') }
+              { t('Type.Heading') }
             </FormLabel>
             <RadioGroup
               row
@@ -89,7 +89,7 @@ const App = () => {
         <Box my={2}>
           <FormControl>
             <FormLabel component="legend" mt={4}>
-              { t('Delete-Original') }
+              { t('Cleanup.Heading') }
             </FormLabel>
             <RadioGroup
               row

@@ -1,9 +1,20 @@
 {
   "Conversion" : {
-    "Delete-Original" : "元のファイルを削除" ,
-    "Select-Folder" : "フォルダを選択" ,
-    "Select-Type" : "変換タイプを選択" ,
-    "Folder-Path" : "フォルダパス" ,
+
+    "Folder" : {
+      "Placeholder" : "フォルダが選択されていません" ,
+      "Select" : "フォルダを選択" ,
+      "Label" : "フォルダパス"
+    },
+
+    "Type" : {
+      "Heading" : "変換タイプを選択"
+    },
+
+    "Cleanup" : {
+      "Heading" : "元のファイルを削除"
+    },
+
     "Convert" : "変換"
   }
 }

@@ -1,9 +1,20 @@
 {
   "Conversion" : {
-    "Delete-Original" : "Delete original file" ,
-    "Select-Folder" : "Select Folder" ,
-    "Select-Type" : "Select the conversion type" ,
-    "Folder-Path" : "Folder Path" ,
+
+    "Folder" : {
+      "Placeholder" : "Please select a folder" ,
+      "Select" : "Folder Path" ,
+      "Label" : "Folder"
+    },
+
+    "Type" : {
+      "Heading" : "Select the conversion type"
+    },
+
+    "Cleanup" : {
+      "Heading" : "Delete original file"
+    },
+
     "Convert" : "Convert"
   }
 }
