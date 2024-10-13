@@ -12,7 +12,7 @@ I18n
 .use(initReactI18next)
 .init({
 
-  resources : { en, jp } ,
+  resources : { en , jp } ,
 
   fallbackLng : 'en' ,
   defaultNS : 'common' ,

@@ -5,30 +5,33 @@ import { useTranslation } from 'react-i18next'
 import './I18n'
 
 
+const { electron } = window
+
+
 const App = () => {
 
   const { i18n , t } = useTranslation('Conversion')
 
-  const [folderPath, setFolderPath] = useState('');
+  const [folderPath, setFolderPath] = useState(null);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversionType, setConversionType] = useState('webp-to-png');  // 変換タイプの状態管理
   const [removeFile, setRemoveFile] = useState("false")
 
   const selectFolder = async () => {
-    const folder = await window.electron.selectFolder();  // preload経由でIPC通信
-    setFolderPath(folder || 'フォルダが選択されていません');
+    const folder = await electron.selectFolder();  // preload経由でIPC通信
+    setFolderPath( folder ?? null );
   };
 
   const convertFiles = async () => {
-    if (folderPath && folderPath !== 'フォルダが選択されていません') {
-      setIsLoading(true)
-      const result = await window.electron.convertWebPToPNG(folderPath, conversionType, removeFile);  // IPC通信
-      setIsLoading(false)
-      setMessage(result);
-    } else {
-      setMessage('フォルダを選択してください');
-    }
+
+    if( ! folderPath )
+      return
+
+    setIsLoading(true)
+    const result = await window.electron.convertWebPToPNG(folderPath, conversionType, removeFile);  // IPC通信
+    setIsLoading(false)
+    setMessage(result);
   };
 
   return (
@@ -59,10 +62,10 @@ const App = () => {
             fullWidth
             variant="outlined"
             label={ t('Folder-Path') }
-            value={folderPath}
-            InputProps={{
-              readOnly: true,
-            }}
+            value={folderPath ?? 'フォルダが選択されていません' }
+            aria-readonly = 'true'
+            aria-disabled = 'true'
+            disabled = { true }
           />
         </Box>
 
@@ -101,7 +104,12 @@ const App = () => {
         </Box>
 
 
-        <Button variant="contained" color="secondary" onClick={convertFiles} disabled={isLoading}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={convertFiles}
+          disabled={isLoading || ! folderPath }
+        >
           { t('Convert') }
         </Button>
 
