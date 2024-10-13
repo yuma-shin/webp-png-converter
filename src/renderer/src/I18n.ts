@@ -3,10 +3,12 @@ import { initReactI18next } from 'react-i18next'
 import * as en from '../Locales/en.json'
 import * as jp from '../Locales/jp.json'
 
-import i18n from 'i18next'
+import LanguageDetector from 'i18next-browser-languagedetector'
+import I18n from 'i18next'
 
 
-i18n
+I18n
+.use(LanguageDetector)
 .use(initReactI18next)
 .init({
 
@@ -14,7 +16,6 @@ i18n
 
   fallbackLng : 'en' ,
   defaultNS : 'common' ,
-  lng : 'jp',
 
   interpolation : {
     escapeValue : false
@@ -22,4 +23,4 @@ i18n
 })
 
 
-export default i18n
+export default I18n

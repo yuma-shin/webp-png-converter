@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Typography, TextField, Box, Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl } from '@mui/material';
+import { Button, Typography, TextField, Box, Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
 import { useTranslation } from 'react-i18next'
 
 import './I18n'
@@ -7,7 +7,7 @@ import './I18n'
 
 const App = () => {
 
-  const { t } = useTranslation('Conversion')
+  const { i18n , t } = useTranslation('Conversion')
 
   const [folderPath, setFolderPath] = useState('');
   const [message, setMessage] = useState('');
@@ -33,6 +33,18 @@ const App = () => {
 
   return (
     <Container maxWidth="sm">
+      <Select
+        value = { i18n.language }
+        onChange = { ( event ) => {
+
+          const language = event.target.value
+
+          i18n.changeLanguage(language)
+        }}
+      >
+        <MenuItem value={'jp'}>JP</MenuItem>
+        <MenuItem value={'en'}>EN</MenuItem>
+      </Select>
       <Box my={4} textAlign="center">
         <Typography variant="h4" gutterBottom>
           WebP - PNG Converter
