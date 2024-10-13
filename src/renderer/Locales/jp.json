@@ -1,5 +1,9 @@
 {
-  "translation" : {
-
+  "Conversion" : {
+    "Delete-Original" : "元のファイルを削除" ,
+    "Select-Folder" : "フォルダを選択" ,
+    "Select-Type" : "変換タイプを選択" ,
+    "Folder-Path" : "フォルダパス" ,
+    "Convert" : "変換"
   }
 }

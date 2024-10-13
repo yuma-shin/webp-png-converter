@@ -11,6 +11,9 @@ i18n
 .init({
 
   resources : { en, jp } ,
+
+  fallbackLng : 'en' ,
+  defaultNS : 'common' ,
   lng : 'jp',
 
   interpolation : {

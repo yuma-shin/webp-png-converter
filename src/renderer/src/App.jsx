@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { Button, Typography, TextField, Box, Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl } from '@mui/material';
+import { useTranslation } from 'react-i18next'
 
 import './I18n'
 
 
 const App = () => {
+
+  const { t } = useTranslation('Conversion')
+
   const [folderPath, setFolderPath] = useState('');
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -35,14 +39,14 @@ const App = () => {
         </Typography>
 
         <Button variant="contained" color="primary" onClick={selectFolder} disabled={isLoading}>
-          フォルダを選択
+          { t('Select-Folder') }
         </Button>
 
         <Box my={2}>
           <TextField
             fullWidth
             variant="outlined"
-            label="フォルダパス"
+            label={ t('Folder-Path') }
             value={folderPath}
             InputProps={{
               readOnly: true,
@@ -52,7 +56,9 @@ const App = () => {
 
         <Box my={2}>
           <FormControl>
-            <FormLabel component="legend">変換タイプを選択</FormLabel>
+            <FormLabel component="legend">
+              { t('Select-Type') }
+            </FormLabel>
             <RadioGroup
               row
               value={conversionType}
@@ -67,7 +73,9 @@ const App = () => {
 
         <Box my={2}>
           <FormControl>
-            <FormLabel component="legend" mt={4}>元のファイルを削除</FormLabel>
+            <FormLabel component="legend" mt={4}>
+              { t('Delete-Original') }
+            </FormLabel>
             <RadioGroup
               row
               value={removeFile}
@@ -82,7 +90,7 @@ const App = () => {
 
 
         <Button variant="contained" color="secondary" onClick={convertFiles} disabled={isLoading}>
-          変換
+          { t('Convert') }
         </Button>
 
         <Box my={2}>
