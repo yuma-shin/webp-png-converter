@@ -1,10 +1,23 @@
+
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import DOM from 'react-dom/client'
 import App from './App'
 
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const host = document
+  .getElementById(`root`)
+
+if( ! host )
+  throw `Host element is missing!`
+
+
+const node = (
   <React.StrictMode>
     <App />
   </React.StrictMode>
 )
+
+
+DOM
+.createRoot(host)
+.render(node)
