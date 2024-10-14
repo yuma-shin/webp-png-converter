@@ -8,6 +8,7 @@ import { OutputFormat } from '../../preload/Types'
 
 import '../../preload/Types'
 import './I18n'
+import { FormatSelector } from '../Components/FormatSelector';
 
 
 const { electron } = window
@@ -21,7 +22,9 @@ function Component (){
   const [ removeFile , setRemoveFile ] = useState(false)
   const [ isLoading , setIsLoading ] = useState(false)
   const [ message , setMessage ] = useState('')
-  const [ format , setFormat ] = useState<OutputFormat>('png')  // 変換タイプの状態管理
+
+  const [ format , setFormat ] =
+    useState<OutputFormat>('webp')
 
   const selectFolder = async () => {
     const folder = await electron.selectFolder()  // preload経由でIPC通信
@@ -98,36 +101,10 @@ function Component (){
           />
         </Box>
 
-        <Box my = { 2 } >
-          <FormControl>
-
-            <FormLabel
-              component = 'legend'
-              children = { t('Type.Heading') }
-            />
-
-            <ToggleButtonGroup
-              aria-label = 'Output Format'
-              exclusive = { true }
-              onChange = { ( _ , format ) => setFormat(format) }
-              color = 'primary'
-              value = { format }
-            >
-
-              <ToggleButton
-                children = { `WEBP` }
-                value = 'webp'
-              />
-
-              <ToggleButton
-                children = { `PNG` }
-                value = 'png'
-              />
-
-            </ToggleButtonGroup>
-
-          </FormControl>
-        </Box>
+        <FormatSelector
+          onChange = { setFormat }
+          value = { format }
+        />
 
         <Box my = { 2 } >
           <FormControl>

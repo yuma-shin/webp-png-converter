@@ -39,8 +39,8 @@
                 "package-lock.json",
                 "src/main/tsconfig.json",
                 "src/preload/tsconfig.json",
-                "src/renderer/src/tsconfig.json",
-                "src/tsconfig.json"
+                "src/tsconfig.json",
+                "src/renderer/tsconfig.json"
             ]
         }
     ]
@@ -67,8 +67,8 @@
     "package-lock.json": true,
     "src/main/tsconfig.json": true,
     "src/preload/tsconfig.json": true,
-    "src/renderer/src/tsconfig.json": true,
-    "src/tsconfig.json": true
+    "src/tsconfig.json": true,
+    "src/renderer/tsconfig.json": true
 },
 "hidefiles.selectedProfile": "Strict"
 }
