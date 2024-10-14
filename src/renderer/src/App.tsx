@@ -17,7 +17,7 @@ const App = () => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversionType, setConversionType] = useState('webp-to-png');  // 変換タイプの状態管理
-  const [removeFile, setRemoveFile] = useState("false")
+  const [removeFile, setRemoveFile] = useState(false)
 
   const selectFolder = async () => {
     const folder = await electron.selectFolder();  // preload経由でIPC通信
@@ -95,8 +95,8 @@ const App = () => {
             />
             <RadioGroup
               row
-              value={removeFile}
-              onChange={(e) => setRemoveFile(e.target.value)}
+              value={removeFile ? 'true' : 'false'}
+              onChange={(e) => setRemoveFile(e.target.value === 'true')}
               style={{ width: 'auto' }}
             >
               <FormControlLabel value="true" control={<Radio />} label="True" />
