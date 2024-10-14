@@ -1,7 +1,8 @@
 
 import React from 'react'
 import DOM from 'react-dom/client'
-import App from './App'
+
+import { App } from './App'
 
 
 const host = document

@@ -1,6 +1,10 @@
+
+export { Component as App }
+
 import React, { useState } from 'react';
-import { Button, Typography, TextField, Box, Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
+import { Button, Typography, TextField, Box, ToggleButtonGroup , ToggleButton , Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
 import { useTranslation } from 'react-i18next'
+import { OutputFormat } from '../../preload/Types'
 
 import '../../preload/Types'
 import './I18n'
@@ -9,20 +13,20 @@ import './I18n'
 const { electron } = window
 
 
-const App = () => {
+function Component (){
 
   const { i18n , t } = useTranslation('Conversion')
 
-  const [folderPath, setFolderPath] = useState< null | string >(null);
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [conversionType, setConversionType] = useState('webp-to-png');  // 変換タイプの状態管理
-  const [removeFile, setRemoveFile] = useState(false)
+  const [ folderPath , setFolderPath ] = useState< null | string >(null)
+  const [ removeFile , setRemoveFile ] = useState(false)
+  const [ isLoading , setIsLoading ] = useState(false)
+  const [ message , setMessage ] = useState('')
+  const [ format , setFormat ] = useState<OutputFormat>('png')  // 変換タイプの状態管理
 
   const selectFolder = async () => {
-    const folder = await electron.selectFolder();  // preload経由でIPC通信
-    setFolderPath( folder ?? null );
-  };
+    const folder = await electron.selectFolder()  // preload経由でIPC通信
+    setFolderPath( folder ?? null )
+  }
 
   const convertFiles = async () => {
 
@@ -30,13 +34,17 @@ const App = () => {
       return
 
     setIsLoading(true)
-    const result = await window.electron.convertWebPToPNG(folderPath, conversionType, removeFile);  // IPC通信
+
+    const result = await electron
+      .convertWebPToPNG(folderPath,format,removeFile)  // IPC通信
+
     setIsLoading(false)
-    setMessage(result);
-  };
+    setMessage(result)
+  }
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth = 'sm' >
+
       <Select
         value = { i18n.language }
         onChange = { ( event ) => {
@@ -46,87 +54,135 @@ const App = () => {
           i18n.changeLanguage(language)
         }}
       >
-        <MenuItem value={'jp'}>JP</MenuItem>
-        <MenuItem value={'en'}>EN</MenuItem>
+
+        <MenuItem
+          children = { 'JP' }
+          value = { 'jp' }
+        />
+
+        <MenuItem
+          children = { 'EN' }
+          value = { 'en' }
+        />
+
       </Select>
-      <Box my={4} textAlign="center">
-        <Typography variant="h4" gutterBottom>
-          WebP - PNG Converter
-        </Typography>
 
-        <Button variant="contained" color="primary" onClick={selectFolder} disabled={isLoading}>
-          { t('Folder.Select') }
-        </Button>
+      <Box
+        textAlign = 'center'
+        my = { 4 }
+      >
 
-        <Box my={2}>
+        <Typography
+          gutterBottom = { true }
+          children = { `WebP - PNG Converter` }
+          variant = 'h4'
+        />
+
+        <Button
+          children = { t('Folder.Select') }
+          disabled = { isLoading }
+          onClick = { selectFolder }
+          variant = 'contained'
+          color = 'primary'
+        />
+
+        <Box my = { 2 } >
           <TextField
-            fullWidth
-            variant="outlined"
-            label={ t('Folder.Label') }
-            value={folderPath ?? t('Folder.Placeholder') }
             aria-readonly = 'true'
             aria-disabled = 'true'
+            fullWidth = { true }
             disabled = { true }
+            variant = 'outlined'
+            value = { folderPath ?? t('Folder.Placeholder') }
+            label = { t('Folder.Label') }
           />
         </Box>
 
-        <Box my={2}>
+        <Box my = { 2 } >
           <FormControl>
-            <FormLabel component="legend">
-              { t('Type.Heading') }
-            </FormLabel>
-            <RadioGroup
-              row
-              value={conversionType}
-              onChange={(e) => setConversionType(e.target.value)}
-              style={{ width: 'auto' }}
+
+            <FormLabel
+              component = 'legend'
+              children = { t('Type.Heading') }
+            />
+
+            <ToggleButtonGroup
+              aria-label = 'Output Format'
+              exclusive = { true }
+              onChange = { ( _ , format ) => setFormat(format) }
+              color = 'primary'
+              value = { format }
             >
-              <FormControlLabel value="webp-to-png" control={<Radio />} label="WebP → PNG" />
-              <FormControlLabel value="png-to-webp" control={<Radio />} label="PNG → WebP" />
-            </RadioGroup>
+
+              <ToggleButton
+                children = { `WEBP` }
+                value = 'webp'
+              />
+
+              <ToggleButton
+                children = { `PNG` }
+                value = 'png'
+              />
+
+            </ToggleButtonGroup>
+
           </FormControl>
         </Box>
 
-        <Box my={2}>
+        <Box my = { 2 } >
           <FormControl>
+
             <FormLabel
-              children = { t('Cleanup.Heading') }
               component = 'legend'
+              children = { t('Cleanup.Heading') }
             />
+
             <RadioGroup
-              row
-              value={removeFile ? 'true' : 'false'}
-              onChange={(e) => setRemoveFile(e.target.value === 'true')}
-              style={{ width: 'auto' }}
+              onChange = { ( event ) => setRemoveFile(event.target.value === 'true') }
+              value = { removeFile ? 'true' : 'false' }
+              style = {{ width : 'auto' }}
+              row = { true }
             >
-              <FormControlLabel value="true" control={<Radio />} label="True" />
-              <FormControlLabel value="false" control={<Radio />} label="False" />
+
+              <FormControlLabel
+                control = { <Radio /> }
+                label = 'True'
+                value = 'true'
+              />
+
+              <FormControlLabel
+                control = { <Radio /> }
+                label = 'False'
+                value = 'false'
+              />
+
             </RadioGroup>
           </FormControl>
         </Box>
 
 
         <Button
-          variant="contained"
-          color="secondary"
-          onClick={convertFiles}
-          disabled={isLoading || ! folderPath }
-        >
-          { t('Convert') }
-        </Button>
+          children = { t('Convert') }
+          disabled = { isLoading || ! folderPath }
+          onClick = { convertFiles }
+          variant = 'contained'
+          color = 'secondary'
+        />
 
-        <Box my={2}>
-          {isLoading && <CircularProgress />}
+        <Box my = { 2 } >
 
-          {!isLoading && message && (
-            <Alert severity={message.includes('エラー') ? 'error' : 'success'}>
-              {message}
-            </Alert>
+          { isLoading && <CircularProgress /> }
+
+          { ! isLoading && message && (
+            <Alert
+              children = { message }
+              severity = { message.includes('エラー') ? 'error' : 'success' }
+            />
           )}
+
         </Box>
+
       </Box>
     </Container>
-  );
-};
-
-export default App;
+  )
+}
