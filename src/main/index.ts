@@ -1,8 +1,9 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join, extname, basename } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+// @ts-ignore
 import icon from '../../resources/icon.png?asset'
-import sharp from 'sharp'
+import sharp, { FormatEnum } from 'sharp'
 import util from 'util'
 import fs from 'fs'
 
@@ -80,7 +81,7 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // ファイルの変換関数
-const convertFile = async (filePath, outputFilePath, format, removeFile) => {
+const convertFile = async (filePath : string, outputFilePath : string, format : keyof FormatEnum , removeFile : string) => {
   await sharp(filePath).toFormat(format).toFile(outputFilePath)
   if (removeFile == 'true') {
     await new Promise((resolve) => setTimeout(resolve, 500)) // 500msの遅延
@@ -88,7 +89,7 @@ const convertFile = async (filePath, outputFilePath, format, removeFile) => {
   }
 }
 
-const convertFiles = async (folderPath, conversionType, removeFile) => {
+const convertFiles = async (folderPath : string, conversionType : string , removeFile : string) => {
   const files = await readdir(folderPath)
   if (removeFile == 'false') {
     if (conversionType === 'webp-to-png') {
@@ -146,6 +147,10 @@ ipcMain.handle('convert-files', async (event, folderPath, conversionType, remove
     await convertFiles(folderPath, conversionType, removeFile) // 全てのファイルが変換完了するのを待つ
     return '変換完了しました'
   } catch (error) {
-    return `エラーが発生しました: ${error.message}`
+
+    if( typeof error === 'object' && error && 'message' in error )
+        return `エラーが発生しました: ${error.message}`
+
+    return error
   }
 })
