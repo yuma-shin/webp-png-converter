@@ -1,10 +1,10 @@
-- [日本語 JP](README_JP.md)
+- [English US](README.md)
 
 # WebP - PNG Converter
 
-![UI](./doc/ui_en.png)
+![UI](./doc/ui_jp.png)
 
-This is a tool for converting image files between WebP and PNG formats (mainly for personal use).
+画像ファイルのwebpとpngの相互変換をするツールです。(主に自分で使う用)
 
 ## Stack
 
@@ -14,25 +14,25 @@ This is a tool for converting image files between WebP and PNG formats (mainly f
 - [MUI](https://mui.com/)
 - [sharp](https://sharp.pixelplumbing.com/)
 
-## Recommended IDE Setup
+## IDEのセットアップ
 
 - [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-## Project Setup
+## プロジェクトのセットアップ
 
-### Install
+### インストール
 
 ```bash
 $ npm install
 ```
 
-### Development
+### 開発環境
 
 ```bash
 $ npm run dev
 ```
 
-### Build
+### ビルド
 
 ```bash
 # For windows
@@ -45,15 +45,15 @@ $ npm run build:mac
 $ npm run build:linux
 ```
 
-## Contribution
+## コントリビューション
 
-If you find any bugs in the source code, it would be helpful if you could create an Issue on the GitHub repository.  
-It would be even more helpful if you could fix the bug and submit a Pull Request.
+ソースコード上でバグを発見されたら、GitHub 上の Repository にて Issue を作成していただけると助かります。  
+バグを修正して Pull requests を提出していただけるとさらに助かります。
 
 ## Author
 
 Yuma Shintani ([@yuma-shin](https://github.com/yuma-shin))
 
-## License
+## ライセンス
 
 - The MIT License (MIT)

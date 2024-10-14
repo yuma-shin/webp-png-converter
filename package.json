@@ -1,6 +1,6 @@
 {
   "name": "webp-png-converter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "WebP / PNG image converter",
   "main": "./out/main/index.js",
   "author": "Yuma Shintani",
@@ -32,7 +32,8 @@
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.2",
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.2",
     "electron": "^32.2.0",
     "electron-builder": "^25.1.8",
     "electron-vite": "^2.3.0",
@@ -41,6 +42,7 @@
     "prettier": "^3.3.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "vite": "^5.4.8"
+    "vite": "^5.4.8",
+    "typescript": "^5.6.3"
   }
 }

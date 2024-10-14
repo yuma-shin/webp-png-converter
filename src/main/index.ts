@@ -1,14 +1,20 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join, extname, basename } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+// @ts-ignore
 import icon from '../../resources/icon.png?asset'
-import sharp from 'sharp'
+import sharp, { FormatEnum } from 'sharp'
 import util from 'util'
 import fs from 'fs'
 
 // fs.unlinkをPromise化して非同期処理に対応
 const unlink = util.promisify(fs.unlink)
 const readdir = util.promisify(fs.readdir)
+
+enum ConversionType {
+  WEBP_TO_PNG = 'webp-to-png',
+  PNG_TO_WEBP = 'png-to-webp'
+}
 
 function createWindow() {
   // Create the browser window.
@@ -80,22 +86,31 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // ファイルの変換関数
-const convertFile = async (filePath, outputFilePath, format, removeFile) => {
+const convertFile = async (
+  filePath: string,
+  outputFilePath: string,
+  format: keyof FormatEnum,
+  removeFile: boolean
+) => {
   await sharp(filePath).toFormat(format).toFile(outputFilePath)
-  if (removeFile == 'true') {
+  if (removeFile) {
     await new Promise((resolve) => setTimeout(resolve, 500)) // 500msの遅延
     await unlink(filePath) // 元のファイルを削除
   }
 }
 
-const convertFiles = async (folderPath, conversionType, removeFile) => {
+const convertFiles = async (
+  folderPath: string,
+  conversionType: ConversionType,
+  removeFile: boolean
+) => {
   const files = await readdir(folderPath)
-  if (removeFile == 'false') {
-    if (conversionType === 'webp-to-png') {
+  if (!removeFile) {
+    if (conversionType === ConversionType.WEBP_TO_PNG) {
       if (!fs.existsSync(folderPath + '/png')) {
         fs.mkdirSync(folderPath + '/png', { recursive: true })
       }
-    } else if (conversionType === 'png-to-webp') {
+    } else if (conversionType === ConversionType.PNG_TO_WEBP) {
       if (!fs.existsSync(folderPath + '/webp')) {
         fs.mkdirSync(folderPath + '/webp', { recursive: true })
       }
@@ -105,26 +120,26 @@ const convertFiles = async (folderPath, conversionType, removeFile) => {
       if (fs.statSync(filePath).isDirectory()) {
         return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
       } else {
-        if (conversionType === 'webp-to-png' && extname(file) === '.webp') {
+        if (conversionType === ConversionType.WEBP_TO_PNG && extname(file) === '.webp') {
           const outputFilePath = join(folderPath + '/png', basename(file, '.webp') + '.png')
           return convertFile(filePath, outputFilePath, 'png', removeFile)
-        } else if (conversionType === 'png-to-webp' && extname(file) === '.png') {
+        } else if (conversionType === ConversionType.PNG_TO_WEBP && extname(file) === '.png') {
           const outputFilePath = join(folderPath + '/webp', basename(file, '.png') + '.webp')
           return convertFile(filePath, outputFilePath, 'webp', removeFile)
         }
       }
     })
     await Promise.all(tasks)
-  } else if (removeFile == 'true') {
+  } else if (removeFile) {
     const tasks = files.map(async (file) => {
       const filePath = join(folderPath, file)
       if (fs.statSync(filePath).isDirectory()) {
         return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
       } else {
-        if (conversionType === 'webp-to-png' && extname(file) === '.webp') {
+        if (conversionType === ConversionType.WEBP_TO_PNG && extname(file) === '.webp') {
           const outputFilePath = join(folderPath, basename(file, '.webp') + '.png')
           return convertFile(filePath, outputFilePath, 'png', removeFile)
-        } else if (conversionType === 'png-to-webp' && extname(file) === '.png') {
+        } else if (conversionType === ConversionType.PNG_TO_WEBP && extname(file) === '.png') {
           const outputFilePath = join(folderPath, basename(file, '.png') + '.webp')
           return convertFile(filePath, outputFilePath, 'webp', removeFile)
         }
@@ -146,6 +161,9 @@ ipcMain.handle('convert-files', async (event, folderPath, conversionType, remove
     await convertFiles(folderPath, conversionType, removeFile) // 全てのファイルが変換完了するのを待つ
     return '変換完了しました'
   } catch (error) {
-    return `エラーが発生しました: ${error.message}`
+    if (typeof error === 'object' && error && 'message' in error)
+      return `エラーが発生しました: ${error.message}`
+
+    return error
   }
 })

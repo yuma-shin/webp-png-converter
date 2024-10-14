@@ -7,7 +7,7 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', {
       selectFolder: () => ipcRenderer.invoke('select-folder'),
-      convertWebPToPNG: (folderPath, conversionType, removeFile) =>
+      convertWebPToPNG: (folderPath: string, conversionType: string, removeFile: boolean) =>
         ipcRenderer.invoke('convert-files', folderPath, conversionType, removeFile)
     })
   } catch (error) {
