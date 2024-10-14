@@ -1,55 +1,79 @@
 import React, { useState } from 'react';
-import { Button, Typography, TextField, Box, Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl } from '@mui/material';
+import { Button, Typography, TextField, Box, Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
+import { useTranslation } from 'react-i18next'
+
+import './I18n'
+
+
+const { electron } = window
+
 
 const App = () => {
-  const [folderPath, setFolderPath] = useState('');
+
+  const { i18n , t } = useTranslation('Conversion')
+
+  const [folderPath, setFolderPath] = useState(null);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversionType, setConversionType] = useState('webp-to-png');  // 変換タイプの状態管理
   const [removeFile, setRemoveFile] = useState("false")
 
   const selectFolder = async () => {
-    const folder = await window.electron.selectFolder();  // preload経由でIPC通信
-    setFolderPath(folder || 'フォルダが選択されていません');
+    const folder = await electron.selectFolder();  // preload経由でIPC通信
+    setFolderPath( folder ?? null );
   };
 
   const convertFiles = async () => {
-    if (folderPath && folderPath !== 'フォルダが選択されていません') {
-      setIsLoading(true)
-      const result = await window.electron.convertWebPToPNG(folderPath, conversionType, removeFile);  // IPC通信
-      setIsLoading(false)
-      setMessage(result);
-    } else {
-      setMessage('フォルダを選択してください');
-    }
+
+    if( ! folderPath )
+      return
+
+    setIsLoading(true)
+    const result = await window.electron.convertWebPToPNG(folderPath, conversionType, removeFile);  // IPC通信
+    setIsLoading(false)
+    setMessage(result);
   };
 
   return (
     <Container maxWidth="sm">
+      <Select
+        value = { i18n.language }
+        onChange = { ( event ) => {
+
+          const language = event.target.value
+
+          i18n.changeLanguage(language)
+        }}
+      >
+        <MenuItem value={'jp'}>JP</MenuItem>
+        <MenuItem value={'en'}>EN</MenuItem>
+      </Select>
       <Box my={4} textAlign="center">
         <Typography variant="h4" gutterBottom>
           WebP - PNG Converter
         </Typography>
 
         <Button variant="contained" color="primary" onClick={selectFolder} disabled={isLoading}>
-          フォルダを選択
+          { t('Folder.Select') }
         </Button>
 
         <Box my={2}>
           <TextField
             fullWidth
             variant="outlined"
-            label="フォルダパス"
-            value={folderPath}
-            InputProps={{
-              readOnly: true,
-            }}
+            label={ t('Folder.Label') }
+            value={folderPath ?? t('Folder.Placeholder') }
+            aria-readonly = 'true'
+            aria-disabled = 'true'
+            disabled = { true }
           />
         </Box>
 
         <Box my={2}>
           <FormControl>
-            <FormLabel component="legend">変換タイプを選択</FormLabel>
+            <FormLabel component="legend">
+              { t('Type.Heading') }
+            </FormLabel>
             <RadioGroup
               row
               value={conversionType}
@@ -64,7 +88,9 @@ const App = () => {
 
         <Box my={2}>
           <FormControl>
-            <FormLabel component="legend" mt={4}>元のファイルを削除</FormLabel>
+            <FormLabel component="legend" mt={4}>
+              { t('Cleanup.Heading') }
+            </FormLabel>
             <RadioGroup
               row
               value={removeFile}
@@ -78,8 +104,13 @@ const App = () => {
         </Box>
 
 
-        <Button variant="contained" color="secondary" onClick={convertFiles} disabled={isLoading}>
-          変換
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={convertFiles}
+          disabled={isLoading || ! folderPath }
+        >
+          { t('Convert') }
         </Button>
 
         <Box my={2}>
