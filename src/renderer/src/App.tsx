@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Typography, TextField, Box, Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
 import { useTranslation } from 'react-i18next'
 
+import '../../preload/Types'
 import './I18n'
 
 
@@ -12,7 +13,7 @@ const App = () => {
 
   const { i18n , t } = useTranslation('Conversion')
 
-  const [folderPath, setFolderPath] = useState(null);
+  const [folderPath, setFolderPath] = useState< null | string >(null);
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversionType, setConversionType] = useState('webp-to-png');  // 変換タイプの状態管理
@@ -88,9 +89,10 @@ const App = () => {
 
         <Box my={2}>
           <FormControl>
-            <FormLabel component="legend" mt={4}>
-              { t('Cleanup.Heading') }
-            </FormLabel>
+            <FormLabel
+              children = { t('Cleanup.Heading') }
+              component = 'legend'
+            />
             <RadioGroup
               row
               value={removeFile}
