@@ -11,20 +11,25 @@ import {
 
 
 interface Args {
-  onChange : ( format : OutputFormat ) => void
+  isDisabled : boolean
+  onChange : ( value : OutputFormat ) => void
   value : OutputFormat
 }
 
 
 function Component (
-  { onChange , value } : Args
+  { isDisabled , onChange , value } : Args
 ){
 
   const { t } = useTranslation('Conversion')
 
   return (
     <Box my = { 2 } >
-      <FormControl>
+      <FormControl
+        style = {{
+          alignItems : 'center'
+        }}
+      >
 
         <FormLabel
           component = 'legend'
@@ -35,6 +40,7 @@ function Component (
           aria-label = 'Output Format'
           exclusive = { true }
           onChange = { ( _ , format ) => onChange(format) }
+          disabled = { isDisabled }
           color = 'primary'
           value = { value }
         >

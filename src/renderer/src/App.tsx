@@ -10,6 +10,7 @@ import { useState } from 'react'
 
 import '../../preload/Types'
 import './I18n'
+import { CleanupSelector } from '../Components/CleanupSelector';
 
 
 
@@ -20,7 +21,6 @@ function Component (){
 
   const { i18n , t } = useTranslation('Conversion')
 
-  const [ removeFile , setRemoveFile ] = useState(false)
   const [ isLoading , setIsLoading ] = useState(false)
   const [ message , setMessage ] = useState('')
 
@@ -29,6 +29,9 @@ function Component (){
 
   const [ folder , setFolder ] =
     useState< null | string >(null)
+
+  const [ cleanup , setCleanup ] =
+    useState(false)
 
 
   const convertFiles = async () => {
@@ -39,7 +42,7 @@ function Component (){
     setIsLoading(true)
 
     const result = await electron
-      .convertWebPToPNG(folder,format,removeFile)  // IPC通信
+      .convertWebPToPNG(folder,format,cleanup)  // IPC通信
 
     setIsLoading(false)
     setMessage(result)
@@ -88,40 +91,16 @@ function Component (){
         />
 
         <FormatSelector
+          isDisabled = { isLoading }
           onChange = { setFormat }
           value = { format }
         />
 
-        <Box my = { 2 } >
-          <FormControl>
-
-            <FormLabel
-              component = 'legend'
-              children = { t('Cleanup.Heading') }
-            />
-
-            <RadioGroup
-              onChange = { ( event ) => setRemoveFile(event.target.value === 'true') }
-              value = { removeFile ? 'true' : 'false' }
-              style = {{ width : 'auto' }}
-              row = { true }
-            >
-
-              <FormControlLabel
-                control = { <Radio /> }
-                label = 'True'
-                value = 'true'
-              />
-
-              <FormControlLabel
-                control = { <Radio /> }
-                label = 'False'
-                value = 'false'
-              />
-
-            </RadioGroup>
-          </FormControl>
-        </Box>
+        <CleanupSelector
+          isDisabled = { isLoading }
+          onChange = { setCleanup }
+          value = { cleanup }
+        />
 
 
         <Button
