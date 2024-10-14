@@ -1,6 +1,6 @@
 {
   "name": "webp-png-converter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "WebP / PNG image converter",
   "main": "./out/main/index.js",
   "author": "Yuma Shintani",
@@ -42,7 +42,7 @@
     "prettier": "^3.3.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "vite": "^5.4.8" ,
-    "typescript" : "^5.6.3"
+    "vite": "^5.4.8",
+    "typescript": "^5.6.3"
   }
 }
