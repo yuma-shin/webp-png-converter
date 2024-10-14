@@ -3,7 +3,6 @@ export { Component as FormatSelector }
 
 import { useTranslation } from 'react-i18next'
 import { OutputFormat } from '../../preload/Types'
-import { useState } from 'react'
 
 import {
   ToggleButtonGroup , ToggleButton ,

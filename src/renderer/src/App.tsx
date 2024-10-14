@@ -1,14 +1,16 @@
 
 export { Component as App }
 
-import React, { useState } from 'react';
-import { Button, Typography, TextField, Box, ToggleButtonGroup , ToggleButton , Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
+import { Button, Typography , Box , Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
+import { FormatSelector } from '../Components/FormatSelector'
 import { useTranslation } from 'react-i18next'
+import { FolderChooser } from '../Components/FolderChooser'
 import { OutputFormat } from '../../preload/Types'
+import { useState } from 'react'
 
 import '../../preload/Types'
 import './I18n'
-import { FormatSelector } from '../Components/FormatSelector';
+
 
 
 const { electron } = window
@@ -18,7 +20,6 @@ function Component (){
 
   const { i18n , t } = useTranslation('Conversion')
 
-  const [ folderPath , setFolderPath ] = useState< null | string >(null)
   const [ removeFile , setRemoveFile ] = useState(false)
   const [ isLoading , setIsLoading ] = useState(false)
   const [ message , setMessage ] = useState('')
@@ -26,20 +27,19 @@ function Component (){
   const [ format , setFormat ] =
     useState<OutputFormat>('webp')
 
-  const selectFolder = async () => {
-    const folder = await electron.selectFolder()  // preload経由でIPC通信
-    setFolderPath( folder ?? null )
-  }
+  const [ folder , setFolder ] =
+    useState< null | string >(null)
+
 
   const convertFiles = async () => {
 
-    if( ! folderPath )
+    if( ! folder )
       return
 
     setIsLoading(true)
 
     const result = await electron
-      .convertWebPToPNG(folderPath,format,removeFile)  // IPC通信
+      .convertWebPToPNG(folder,format,removeFile)  // IPC通信
 
     setIsLoading(false)
     setMessage(result)
@@ -81,25 +81,11 @@ function Component (){
           variant = 'h4'
         />
 
-        <Button
-          children = { t('Folder.Select') }
-          disabled = { isLoading }
-          onClick = { selectFolder }
-          variant = 'contained'
-          color = 'primary'
+        <FolderChooser
+          isDisabled = { isLoading }
+          onChange = { setFolder }
+          value = { folder }
         />
-
-        <Box my = { 2 } >
-          <TextField
-            aria-readonly = 'true'
-            aria-disabled = 'true'
-            fullWidth = { true }
-            disabled = { true }
-            variant = 'outlined'
-            value = { folderPath ?? t('Folder.Placeholder') }
-            label = { t('Folder.Label') }
-          />
-        </Box>
 
         <FormatSelector
           onChange = { setFormat }
@@ -140,7 +126,7 @@ function Component (){
 
         <Button
           children = { t('Convert') }
-          disabled = { isLoading || ! folderPath }
+          disabled = { isLoading || ! folder }
           onClick = { convertFiles }
           variant = 'contained'
           color = 'secondary'
