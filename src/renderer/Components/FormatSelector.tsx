@@ -43,6 +43,7 @@ function Component (
           disabled = { isDisabled }
           color = 'primary'
           value = { value }
+          style={{ marginTop : 4 }}
         >
 
           <ToggleButton
