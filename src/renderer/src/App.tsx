@@ -51,38 +51,40 @@ function Component (){
   return (
     <Container maxWidth = 'sm' >
 
-      <Select
-        value = { i18n.language }
-        onChange = { ( event ) => {
+      <Box sx={{display : "flex", justifyContent : "space-between", alignItems : "center"}} my = { 4 }>
+        
+        <Typography
+            children = { `WebP - PNG Converter` }
+            variant = 'h4'
+          />
 
-          const language = event.target.value
+        <Select
+          value = { i18n.language }
+          onChange = { ( event ) => {
 
-          i18n.changeLanguage(language)
-        }}
-      >
+            const language = event.target.value
 
-        <MenuItem
-          children = { 'JP' }
-          value = { 'jp' }
-        />
+            i18n.changeLanguage(language)
+          }}
+        >
 
-        <MenuItem
-          children = { 'EN' }
-          value = { 'en' }
-        />
+          <MenuItem
+            children = { 'JP' }
+            value = { 'jp' }
+          />
 
-      </Select>
+          <MenuItem
+            children = { 'EN' }
+            value = { 'en' }
+          />
+
+        </Select>
+      </Box>
 
       <Box
         textAlign = 'center'
-        my = { 4 }
+        my = { 6 }
       >
-
-        <Typography
-          gutterBottom = { true }
-          children = { `WebP - PNG Converter` }
-          variant = 'h4'
-        />
 
         <FolderChooser
           isDisabled = { isLoading }
@@ -90,18 +92,21 @@ function Component (){
           value = { folder }
         />
 
-        <FormatSelector
-          isDisabled = { isLoading }
-          onChange = { setFormat }
-          value = { format }
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'space-around' }} my = { 2 }>
 
-        <CleanupSelector
-          isDisabled = { isLoading }
-          onChange = { setCleanup }
-          value = { cleanup }
-        />
+          <FormatSelector
+            isDisabled = { isLoading }
+            onChange = { setFormat }
+            value = { format }
+          />
 
+          <CleanupSelector
+            isDisabled = { isLoading }
+            onChange = { setCleanup }
+            value = { cleanup }
+          />
+
+        </Box>
 
         <Button
           children = { t('Convert') }
