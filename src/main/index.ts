@@ -1,3 +1,6 @@
+
+import type { OutputFormat } from '../preload/Types'
+
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join, extname, basename } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -11,10 +14,6 @@ import fs from 'fs'
 const unlink = util.promisify(fs.unlink)
 const readdir = util.promisify(fs.readdir)
 
-enum ConversionType {
-  WEBP_TO_PNG = 'webp-to-png',
-  PNG_TO_WEBP = 'png-to-webp'
-}
 
 function createWindow() {
   // Create the browser window.
@@ -101,16 +100,16 @@ const convertFile = async (
 
 const convertFiles = async (
   folderPath: string,
-  conversionType: ConversionType,
+  conversionType: OutputFormat,
   removeFile: boolean
 ) => {
   const files = await readdir(folderPath)
   if (!removeFile) {
-    if (conversionType === ConversionType.WEBP_TO_PNG) {
+    if (conversionType === 'png') {
       if (!fs.existsSync(folderPath + '/png')) {
         fs.mkdirSync(folderPath + '/png', { recursive: true })
       }
-    } else if (conversionType === ConversionType.PNG_TO_WEBP) {
+    } else if (conversionType === 'webp') {
       if (!fs.existsSync(folderPath + '/webp')) {
         fs.mkdirSync(folderPath + '/webp', { recursive: true })
       }
@@ -120,10 +119,10 @@ const convertFiles = async (
       if (fs.statSync(filePath).isDirectory()) {
         return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
       } else {
-        if (conversionType === ConversionType.WEBP_TO_PNG && extname(file) === '.webp') {
+        if (conversionType === 'png' && extname(file) === '.webp') {
           const outputFilePath = join(folderPath + '/png', basename(file, '.webp') + '.png')
           return convertFile(filePath, outputFilePath, 'png', removeFile)
-        } else if (conversionType === ConversionType.PNG_TO_WEBP && extname(file) === '.png') {
+        } else if (conversionType === 'webp' && extname(file) === '.png') {
           const outputFilePath = join(folderPath + '/webp', basename(file, '.png') + '.webp')
           return convertFile(filePath, outputFilePath, 'webp', removeFile)
         }
@@ -136,10 +135,10 @@ const convertFiles = async (
       if (fs.statSync(filePath).isDirectory()) {
         return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
       } else {
-        if (conversionType === ConversionType.WEBP_TO_PNG && extname(file) === '.webp') {
+        if (conversionType === 'png' && extname(file) === '.webp') {
           const outputFilePath = join(folderPath, basename(file, '.webp') + '.png')
           return convertFile(filePath, outputFilePath, 'png', removeFile)
-        } else if (conversionType === ConversionType.PNG_TO_WEBP && extname(file) === '.png') {
+        } else if (conversionType === 'webp' && extname(file) === '.png') {
           const outputFilePath = join(folderPath, basename(file, '.png') + '.webp')
           return convertFile(filePath, outputFilePath, 'webp', removeFile)
         }
@@ -156,7 +155,7 @@ ipcMain.handle('select-folder', async (event) => {
   return result.filePaths[0] // 選択されたフォルダのパスを返す
 })
 
-ipcMain.handle('convert-files', async (event, folderPath, conversionType, removeFile) => {
+ipcMain.handle('convert-files', async (event, folderPath, conversionType : OutputFormat , removeFile) => {
   try {
     await convertFiles(folderPath, conversionType, removeFile) // 全てのファイルが変換完了するのを待つ
     return '変換完了しました'

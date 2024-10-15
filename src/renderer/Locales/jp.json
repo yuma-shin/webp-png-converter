@@ -7,8 +7,8 @@
       "Label" : "フォルダパス"
     },
 
-    "Type" : {
-      "Heading" : "変換タイプを選択"
+    "Format" : {
+      "Heading" : "出力形式を選択する"
     },
 
     "Cleanup" : {
