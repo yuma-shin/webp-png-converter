@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { OutputFormat } from '../../preload/Types'
 
 import {
-  FormControlLabel , RadioGroup , Radio ,
+  ToggleButtonGroup, ToggleButton,
   FormControl , FormLabel , Box
 } from '@mui/material'
 
@@ -27,6 +27,9 @@ function Component (
     <Box my = { 2 } >
       <FormControl
         disabled = { isDisabled }
+        style = {{
+          alignItems : 'center'
+        }}
       >
 
         <FormLabel
@@ -34,26 +37,27 @@ function Component (
           children = { t('Cleanup.Heading') }
         />
 
-        <RadioGroup
-          onChange = { ( _ , value ) => onChange( value === 'true' ) }
-          style = {{ width : 'auto' }}
+        <ToggleButtonGroup
+          aria-label = 'Remove File'
+          exclusive = { true }
+          onChange = { ( _ , value ) => onChange( value === true ) }
+          disabled = { isDisabled }
+          color = 'primary'
           value = { value }
-          row = { true }
+          style={{ marginTop : 4 }}
         >
 
-          <FormControlLabel
-            control = { <Radio /> }
+          <ToggleButton
+            children = { `TRUE` }
             value = { true }
-            label = 'True'
           />
 
-          <FormControlLabel
-            control = { <Radio /> }
+          <ToggleButton
+            children = { `FALSE` }
             value = { false }
-            label = 'False'
           />
 
-        </RadioGroup>
+        </ToggleButtonGroup>
       </FormControl>
     </Box>
   )
