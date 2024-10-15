@@ -1,132 +1,135 @@
-import React, { useState } from 'react';
-import { Button, Typography, TextField, Box, Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
+
+export { Component as App }
+
+import { Button, Typography , Box , Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
+import { FormatSelector } from '../Components/FormatSelector'
 import { useTranslation } from 'react-i18next'
+import { FolderChooser } from '../Components/FolderChooser'
+import { OutputFormat } from '../../preload/Types'
+import { useState } from 'react'
 
 import '../../preload/Types'
 import './I18n'
+import { CleanupSelector } from '../Components/CleanupSelector';
+
 
 
 const { electron } = window
 
 
-const App = () => {
+function Component (){
 
   const { i18n , t } = useTranslation('Conversion')
 
-  const [folderPath, setFolderPath] = useState< null | string >(null);
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [conversionType, setConversionType] = useState('webp-to-png');  // 変換タイプの状態管理
-  const [removeFile, setRemoveFile] = useState(false)
+  const [ isLoading , setIsLoading ] = useState(false)
+  const [ message , setMessage ] = useState('')
 
-  const selectFolder = async () => {
-    const folder = await electron.selectFolder();  // preload経由でIPC通信
-    setFolderPath( folder ?? null );
-  };
+  const [ format , setFormat ] =
+    useState<OutputFormat>('webp')
+
+  const [ folder , setFolder ] =
+    useState< null | string >(null)
+
+  const [ cleanup , setCleanup ] =
+    useState(false)
+
 
   const convertFiles = async () => {
 
-    if( ! folderPath )
+    if( ! folder )
       return
 
     setIsLoading(true)
-    const result = await window.electron.convertWebPToPNG(folderPath, conversionType, removeFile);  // IPC通信
+
+    const result = await electron
+      .convertWebPToPNG(folder,format,cleanup)  // IPC通信
+
     setIsLoading(false)
-    setMessage(result);
-  };
+    setMessage(result)
+  }
 
   return (
-    <Container maxWidth="sm">
-      <Select
-        value = { i18n.language }
-        onChange = { ( event ) => {
+    <Container maxWidth = 'sm' >
 
-          const language = event.target.value
-
-          i18n.changeLanguage(language)
-        }}
-      >
-        <MenuItem value={'jp'}>JP</MenuItem>
-        <MenuItem value={'en'}>EN</MenuItem>
-      </Select>
-      <Box my={4} textAlign="center">
-        <Typography variant="h4" gutterBottom>
-          WebP - PNG Converter
-        </Typography>
-
-        <Button variant="contained" color="primary" onClick={selectFolder} disabled={isLoading}>
-          { t('Folder.Select') }
-        </Button>
-
-        <Box my={2}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            label={ t('Folder.Label') }
-            value={folderPath ?? t('Folder.Placeholder') }
-            aria-readonly = 'true'
-            aria-disabled = 'true'
-            disabled = { true }
+      <Box sx={{display : "flex", justifyContent : "space-between", alignItems : "center"}} my = { 4 }>
+        
+        <Typography
+            children = { `WebP - PNG Converter` }
+            variant = 'h4'
           />
-        </Box>
 
-        <Box my={2}>
-          <FormControl>
-            <FormLabel component="legend">
-              { t('Type.Heading') }
-            </FormLabel>
-            <RadioGroup
-              row
-              value={conversionType}
-              onChange={(e) => setConversionType(e.target.value)}
-              style={{ width: 'auto' }}
-            >
-              <FormControlLabel value="webp-to-png" control={<Radio />} label="WebP → PNG" />
-              <FormControlLabel value="png-to-webp" control={<Radio />} label="PNG → WebP" />
-            </RadioGroup>
-          </FormControl>
-        </Box>
+        <Select
+          value = { i18n.language }
+          onChange = { ( event ) => {
 
-        <Box my={2}>
-          <FormControl>
-            <FormLabel
-              children = { t('Cleanup.Heading') }
-              component = 'legend'
-            />
-            <RadioGroup
-              row
-              value={removeFile ? 'true' : 'false'}
-              onChange={(e) => setRemoveFile(e.target.value === 'true')}
-              style={{ width: 'auto' }}
-            >
-              <FormControlLabel value="true" control={<Radio />} label="True" />
-              <FormControlLabel value="false" control={<Radio />} label="False" />
-            </RadioGroup>
-          </FormControl>
-        </Box>
+            const language = event.target.value
 
+            i18n.changeLanguage(language)
+          }}
+        >
+
+          <MenuItem
+            children = { 'JP' }
+            value = { 'jp' }
+          />
+
+          <MenuItem
+            children = { 'EN' }
+            value = { 'en' }
+          />
+
+        </Select>
+      </Box>
+
+      <Box
+        textAlign = 'center'
+        my = { 6 }
+      >
+
+        <FolderChooser
+          isDisabled = { isLoading }
+          onChange = { setFolder }
+          value = { folder }
+        />
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-around' }} my = { 2 }>
+
+          <FormatSelector
+            isDisabled = { isLoading }
+            onChange = { setFormat }
+            value = { format }
+          />
+
+          <CleanupSelector
+            isDisabled = { isLoading }
+            onChange = { setCleanup }
+            value = { cleanup }
+          />
+
+        </Box>
 
         <Button
-          variant="contained"
-          color="secondary"
-          onClick={convertFiles}
-          disabled={isLoading || ! folderPath }
-        >
-          { t('Convert') }
-        </Button>
+          children = { t('Convert') }
+          disabled = { isLoading || ! folder }
+          onClick = { convertFiles }
+          variant = 'contained'
+          color = 'secondary'
+        />
 
-        <Box my={2}>
-          {isLoading && <CircularProgress />}
+        <Box my = { 2 } >
 
-          {!isLoading && message && (
-            <Alert severity={message.includes('エラー') ? 'error' : 'success'}>
-              {message}
-            </Alert>
+          { isLoading && <CircularProgress /> }
+
+          { ! isLoading && message && (
+            <Alert
+              children = { message }
+              severity = { message.includes('エラー') ? 'error' : 'success' }
+            />
           )}
+
         </Box>
+
       </Box>
     </Container>
-  );
-};
-
-export default App;
+  )
+}
