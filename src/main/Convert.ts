@@ -10,7 +10,7 @@ import { unlink , readdir , stat } from 'fs/promises'
 import sharp from 'sharp'
 
 
-const DryRun = true
+const DryRun = false
 
 
 interface ConvertFileArgs {
