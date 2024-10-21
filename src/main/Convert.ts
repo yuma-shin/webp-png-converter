@@ -100,12 +100,18 @@ async function collectPaths (
 
   const { folder , format } = args
 
+  const destination = join(folder,format)
+
   const files = new Array<string>
   const paths = new Array<string>
 
   async function collectFolder (
     folder : string
   ){
+
+    if( folder === destination )
+      return
+
     const items = await readdir(folder)
 
     const absolute = items.map(
