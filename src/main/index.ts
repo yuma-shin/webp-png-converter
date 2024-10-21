@@ -7,12 +7,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // @ts-ignore
 import icon from '../../resources/icon.png?asset'
 import sharp, { FormatEnum } from 'sharp'
-import util from 'util'
-import fs from 'fs'
-
-// fs.unlinkをPromise化して非同期処理に対応
-const unlink = util.promisify(fs.unlink)
-const readdir = util.promisify(fs.readdir)
+import { existsSync , mkdirSync , statSync } from 'fs'
+import { unlink , readdir } from 'fs/promises'
 
 
 function createWindow() {
@@ -106,17 +102,17 @@ const convertFiles = async (
   const files = await readdir(folderPath)
   if (!removeFile) {
     if (conversionType === 'png') {
-      if (!fs.existsSync(folderPath + '/png')) {
-        fs.mkdirSync(folderPath + '/png', { recursive: true })
+      if (!existsSync(folderPath + '/png')) {
+        mkdirSync(folderPath + '/png', { recursive: true })
       }
     } else if (conversionType === 'webp') {
-      if (!fs.existsSync(folderPath + '/webp')) {
-        fs.mkdirSync(folderPath + '/webp', { recursive: true })
+      if (!existsSync(folderPath + '/webp')) {
+        mkdirSync(folderPath + '/webp', { recursive: true })
       }
     }
     const tasks = files.map(async (file) => {
       const filePath = join(folderPath, file)
-      if (fs.statSync(filePath).isDirectory()) {
+      if (statSync(filePath).isDirectory()) {
         return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
       } else {
         if (conversionType === 'png' && extname(file) === '.webp') {
@@ -132,7 +128,7 @@ const convertFiles = async (
   } else if (removeFile) {
     const tasks = files.map(async (file) => {
       const filePath = join(folderPath, file)
-      if (fs.statSync(filePath).isDirectory()) {
+      if (statSync(filePath).isDirectory()) {
         return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
       } else {
         if (conversionType === 'png' && extname(file) === '.webp') {
