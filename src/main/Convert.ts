@@ -6,7 +6,6 @@ import type { OutputFormat } from '../preload/Types'
 import { existsSync , mkdirSync , statSync } from 'fs'
 import { join, extname, basename } from 'path'
 import { unlink , readdir } from 'fs/promises'
-import { FormatEnum } from 'sharp'
 
 import sharp from 'sharp'
 
@@ -48,67 +47,39 @@ async function convertFiles (
 
   const { cleanup , format , folder } = args
 
+
+  const outputFolder = join(folder,format)
+
+  if( ! existsSync(outputFolder) )
+    mkdirSync(outputFolder,{ recursive: true })
+
+
   const files = await readdir(folder)
-  if (!cleanup) {
-    if (format === 'png') {
-      if (!existsSync(folder + '/png')) {
-        mkdirSync(folder + '/png', { recursive: true })
-      }
-    } else if (format === 'webp') {
-      if (!existsSync(folder + '/webp')) {
-        mkdirSync(folder + '/webp', { recursive: true })
-      }
-    }
-    const tasks = files.map(async (file) => {
-      const filePath = join(folder, file)
-      if (statSync(filePath).isDirectory()) {
-        return convertFiles({ folder : filePath , format , cleanup }) // サブフォルダも再帰的に処理
-      } else {
-        if (format === 'png' && extname(file) === '.webp') {
-          const outputFilePath = join(folder + '/png', basename(file, '.webp') + '.png')
-          return convertFile({
-            output : outputFilePath ,
-            format : 'png' ,
-            input : filePath ,
-            cleanup
-          })
-        } else if (format === 'webp' && extname(file) === '.png') {
-          const outputFilePath = join(folder + '/webp', basename(file, '.png') + '.webp')
-          return convertFile({
-            output : outputFilePath ,
-            format : 'webp' ,
-            input : filePath ,
-            cleanup
-        })
-        }
-      }
+
+  const tasks = files.map( async ( file ) => {
+
+    const extension = extname(file)
+
+    const filename = basename(file,extension)
+
+    const path = join(folder,file)
+
+    // サブフォルダも再帰的に処理
+    if( statSync(path).isDirectory() )
+      return convertFiles({
+        cleanup , format ,
+        folder : path
+      })
+
+    const name = `${ filename }.${ format }`
+
+    const output = join(folder,format,name)
+
+    return convertFile({
+      cleanup , output , format ,
+      input : path
     })
-    await Promise.all(tasks)
-  } else if (cleanup) {
-    const tasks = files.map(async (file) => {
-      const filePath = join(folder, file)
-      if (statSync(filePath).isDirectory()) {
-        return convertFiles({ folder : filePath , cleanup , format }) // サブフォルダも再帰的に処理
-      } else {
-        if (format === 'png' && extname(file) === '.webp') {
-          const outputFilePath = join(folder, basename(file, '.webp') + '.png')
-          return convertFile({
-            input : filePath ,
-            output : outputFilePath ,
-            format : 'png' ,
-            cleanup
-          })
-        } else if (format === 'webp' && extname(file) === '.png') {
-          const outputFilePath = join(folder, basename(file, '.png') + '.webp')
-          return convertFile({
-            output : outputFilePath ,
-            format : 'webp' ,
-            input : filePath ,
-            cleanup
-          })
-        }
-      }
-    })
-    await Promise.all(tasks)
-  }
+  })
+
+  await Promise.all(tasks)
 }
