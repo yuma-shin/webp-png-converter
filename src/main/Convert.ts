@@ -10,7 +10,7 @@ import { unlink , readdir , stat } from 'fs/promises'
 import sharp from 'sharp'
 
 
-const DryRun = false
+const DryRun = true
 
 
 interface ConvertFileArgs {
@@ -67,7 +67,7 @@ async function convertFiles (
     mkdirSync(outputFolder,{ recursive: true })
 
 
-  const paths = await collectPaths(folder)
+  const paths = await collectPaths(args)
 
   if( DryRun )
     console.debug('Paths',paths)
@@ -95,8 +95,10 @@ async function convertFiles (
 
 
 async function collectPaths (
-  folder : string
+  args : ConvertFilesArgs
 ){
+
+  const { folder , format } = args
 
   const files = new Array<string>
   const paths = new Array<string>
@@ -120,6 +122,11 @@ async function collectPaths (
 
     if( ! path )
       break
+
+    const extension = extname(path)
+
+    if( extension === `.${ format }` )
+      continue
 
     const stats = await stat(path)
 
