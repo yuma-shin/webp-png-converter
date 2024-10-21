@@ -3,11 +3,14 @@ export { convertFiles }
 
 import type { OutputFormat } from '../preload/Types'
 
+import { basename , relative , dirname , extname , join } from 'path'
 import { existsSync , mkdirSync , statSync } from 'fs'
-import { join, extname, basename } from 'path'
-import { unlink , readdir } from 'fs/promises'
+import { unlink , readdir , stat } from 'fs/promises'
 
 import sharp from 'sharp'
+
+
+const DryRun = false
 
 
 interface ConvertFileArgs {
@@ -24,6 +27,11 @@ async function convertFile (
 ){
 
   const { cleanup , format , output , input } = args
+
+  if( DryRun ){
+    console.debug('Convert',args)
+    return
+  }
 
   await sharp(input)
     .toFormat(format)
@@ -59,37 +67,76 @@ async function convertFiles (
     mkdirSync(outputFolder,{ recursive: true })
 
 
-  const files = await readdir(folder)
+  const paths = await collectPaths(folder)
 
-  const tasks = files.map( async ( file ) => {
+  if( DryRun )
+    console.debug('Paths',paths)
 
-    const input = join(folder,file)
+  for ( const input of paths ){
 
-    // サブフォルダも再帰的に処理
+    const extension = extname(input)
 
-    if( statSync(input).isDirectory() )
-      return convertFiles({
-        cleanup , format ,
-        folder : input
-      })
+    const directory = dirname(input)
 
+    const relation = relative(folder,directory)
 
-    const extension = extname(file)
-
-    const filename = basename(file,extension)
+    const filename = basename(input,extension)
 
     const name = `${ filename }.${ format }`
 
-    const output = join(outputFolder,name)
+    const output = join(outputFolder,relation,name)
 
-    return convertFile({
+    await convertFile({
       cleanup , output ,
       format , input
     })
-  })
-
-  await Promise.all(tasks)
+  }
 }
+
+
+async function collectPaths (
+  folder : string
+){
+
+  const files = new Array<string>
+  const paths = new Array<string>
+
+  async function collectFolder (
+    folder : string
+  ){
+    const items = await readdir(folder)
+
+    const absolute = items.map(
+      ( item ) => join(folder,item))
+
+    paths.push( ... absolute )
+  }
+
+  await collectFolder(folder)
+
+  while ( true ){
+
+    const path = paths.shift()
+
+    if( ! path )
+      break
+
+    const stats = await stat(path)
+
+    if( stats.isFile() ){
+      files.push(path)
+      continue
+    }
+
+    if( stats.isDirectory() ){
+      await collectFolder(path)
+      continue
+    }
+  }
+
+  return files
+}
+
 
 
 async function wait (
