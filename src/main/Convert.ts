@@ -25,12 +25,17 @@ async function convertFile (
 
   const { cleanup , format , output , input } = args
 
-  await sharp(input).toFormat(format).toFile(output)
+  await sharp(input)
+    .toFormat(format)
+    .toFile(output)
 
-  if (cleanup) {
-    await new Promise((resolve) => setTimeout(resolve, 500)) // 500msの遅延
-    await unlink(input) // 元のファイルを削除
-  }
+  if( ! cleanup )
+    return
+
+  await wait(500)
+
+  // 元のファイルを削除
+  await unlink(input)
 }
 
 
@@ -58,28 +63,38 @@ async function convertFiles (
 
   const tasks = files.map( async ( file ) => {
 
+    const input = join(folder,file)
+
+    // サブフォルダも再帰的に処理
+
+    if( statSync(input).isDirectory() )
+      return convertFiles({
+        cleanup , format ,
+        folder : input
+      })
+
+
     const extension = extname(file)
 
     const filename = basename(file,extension)
 
-    const path = join(folder,file)
-
-    // サブフォルダも再帰的に処理
-    if( statSync(path).isDirectory() )
-      return convertFiles({
-        cleanup , format ,
-        folder : path
-      })
-
     const name = `${ filename }.${ format }`
 
-    const output = join(folder,format,name)
+    const output = join(outputFolder,name)
 
     return convertFile({
-      cleanup , output , format ,
-      input : path
+      cleanup , output ,
+      format , input
     })
   })
 
   await Promise.all(tasks)
+}
+
+
+async function wait (
+  milliseconds : number
+){
+  await new Promise(( resolve ) =>
+    setTimeout(resolve,milliseconds))
 }
