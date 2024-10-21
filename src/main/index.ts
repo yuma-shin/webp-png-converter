@@ -89,7 +89,12 @@ ipcMain.handle('select-folder', async (event) => {
 
 ipcMain.handle('convert-files', async (event, folderPath, conversionType : OutputFormat , removeFile) => {
   try {
-    await convertFiles(folderPath, conversionType, removeFile) // 全てのファイルが変換完了するのを待つ
+    // 全てのファイルが変換完了するのを待つ
+    await convertFiles({
+      folder : folderPath ,
+      format : conversionType,
+      cleanup : removeFile
+    })
     return '変換完了しました'
   } catch (error) {
     if (typeof error === 'object' && error && 'message' in error)

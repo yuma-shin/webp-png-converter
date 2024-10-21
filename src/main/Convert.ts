@@ -11,63 +11,101 @@ import { FormatEnum } from 'sharp'
 import sharp from 'sharp'
 
 
+interface ConvertFileArgs {
+  cleanup : boolean
+  format : OutputFormat
+  output : string
+  input : string
+}
+
+
 // ファイルの変換関数
-const convertFile = async (
-  filePath: string,
-  outputFilePath: string,
-  format: keyof FormatEnum,
-  removeFile: boolean
-) => {
-  await sharp(filePath).toFormat(format).toFile(outputFilePath)
-  if (removeFile) {
+async function convertFile (
+  args : ConvertFileArgs
+){
+
+  const { cleanup , format , output , input } = args
+
+  await sharp(input).toFormat(format).toFile(output)
+
+  if (cleanup) {
     await new Promise((resolve) => setTimeout(resolve, 500)) // 500msの遅延
-    await unlink(filePath) // 元のファイルを削除
+    await unlink(input) // 元のファイルを削除
   }
 }
 
-const convertFiles = async (
-  folderPath: string,
-  conversionType: OutputFormat,
-  removeFile: boolean
-) => {
-  const files = await readdir(folderPath)
-  if (!removeFile) {
-    if (conversionType === 'png') {
-      if (!existsSync(folderPath + '/png')) {
-        mkdirSync(folderPath + '/png', { recursive: true })
+
+interface ConvertFilesArgs {
+  cleanup : boolean
+  format : OutputFormat
+  folder : string
+}
+
+
+async function convertFiles (
+  args : ConvertFilesArgs
+){
+
+  const { cleanup , format , folder } = args
+
+  const files = await readdir(folder)
+  if (!cleanup) {
+    if (format === 'png') {
+      if (!existsSync(folder + '/png')) {
+        mkdirSync(folder + '/png', { recursive: true })
       }
-    } else if (conversionType === 'webp') {
-      if (!existsSync(folderPath + '/webp')) {
-        mkdirSync(folderPath + '/webp', { recursive: true })
+    } else if (format === 'webp') {
+      if (!existsSync(folder + '/webp')) {
+        mkdirSync(folder + '/webp', { recursive: true })
       }
     }
     const tasks = files.map(async (file) => {
-      const filePath = join(folderPath, file)
+      const filePath = join(folder, file)
       if (statSync(filePath).isDirectory()) {
-        return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
+        return convertFiles({ folder : filePath , format , cleanup }) // サブフォルダも再帰的に処理
       } else {
-        if (conversionType === 'png' && extname(file) === '.webp') {
-          const outputFilePath = join(folderPath + '/png', basename(file, '.webp') + '.png')
-          return convertFile(filePath, outputFilePath, 'png', removeFile)
-        } else if (conversionType === 'webp' && extname(file) === '.png') {
-          const outputFilePath = join(folderPath + '/webp', basename(file, '.png') + '.webp')
-          return convertFile(filePath, outputFilePath, 'webp', removeFile)
+        if (format === 'png' && extname(file) === '.webp') {
+          const outputFilePath = join(folder + '/png', basename(file, '.webp') + '.png')
+          return convertFile({
+            output : outputFilePath ,
+            format : 'png' ,
+            input : filePath ,
+            cleanup
+          })
+        } else if (format === 'webp' && extname(file) === '.png') {
+          const outputFilePath = join(folder + '/webp', basename(file, '.png') + '.webp')
+          return convertFile({
+            output : outputFilePath ,
+            format : 'webp' ,
+            input : filePath ,
+            cleanup
+        })
         }
       }
     })
     await Promise.all(tasks)
-  } else if (removeFile) {
+  } else if (cleanup) {
     const tasks = files.map(async (file) => {
-      const filePath = join(folderPath, file)
+      const filePath = join(folder, file)
       if (statSync(filePath).isDirectory()) {
-        return convertFiles(filePath, conversionType, removeFile) // サブフォルダも再帰的に処理
+        return convertFiles({ folder : filePath , cleanup , format }) // サブフォルダも再帰的に処理
       } else {
-        if (conversionType === 'png' && extname(file) === '.webp') {
-          const outputFilePath = join(folderPath, basename(file, '.webp') + '.png')
-          return convertFile(filePath, outputFilePath, 'png', removeFile)
-        } else if (conversionType === 'webp' && extname(file) === '.png') {
-          const outputFilePath = join(folderPath, basename(file, '.png') + '.webp')
-          return convertFile(filePath, outputFilePath, 'webp', removeFile)
+        if (format === 'png' && extname(file) === '.webp') {
+          const outputFilePath = join(folder, basename(file, '.webp') + '.png')
+          return convertFile({
+            input : filePath ,
+            output : outputFilePath ,
+            format : 'png' ,
+            cleanup
+          })
+        } else if (format === 'webp' && extname(file) === '.png') {
+          const outputFilePath = join(folder, basename(file, '.png') + '.webp')
+          return convertFile({
+            output : outputFilePath ,
+            format : 'webp' ,
+            input : filePath ,
+            cleanup
+          })
         }
       }
     })
