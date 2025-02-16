@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: 20.10.0
 
-      - name: Build/release Llamind
+      - name: Build/release WebPexer
         uses: samuelmeuli/action-electron-builder@v1
         with:
           # GitHub token, automatically provided to the action
