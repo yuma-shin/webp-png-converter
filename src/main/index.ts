@@ -1,4 +1,3 @@
-
 import type { OutputFormat } from '../preload/Types'
 
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
@@ -8,7 +7,6 @@ import { join } from 'path'
 
 // @ts-ignore
 import icon from '../../resources/icon.png?asset'
-
 
 function createWindow() {
   // Create the browser window.
@@ -21,7 +19,8 @@ function createWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
-    }
+    },
+    icon: join(__dirname, '../../build/icon.ico')
   })
 
   mainWindow.setMenu(null)
@@ -79,7 +78,6 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-
 ipcMain.handle('select-folder', async (event) => {
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory']
@@ -87,19 +85,22 @@ ipcMain.handle('select-folder', async (event) => {
   return result.filePaths[0] // 選択されたフォルダのパスを返す
 })
 
-ipcMain.handle('convert-files', async (event, folderPath, conversionType : OutputFormat , removeFile) => {
-  try {
-    // 全てのファイルが変換完了するのを待つ
-    await convertFiles({
-      folder : folderPath ,
-      format : conversionType,
-      cleanup : removeFile
-    })
-    return '変換完了しました'
-  } catch (error) {
-    if (typeof error === 'object' && error && 'message' in error)
-      return `エラーが発生しました: ${error.message}`
+ipcMain.handle(
+  'convert-files',
+  async (event, folderPath, conversionType: OutputFormat, removeFile) => {
+    try {
+      // 全てのファイルが変換完了するのを待つ
+      await convertFiles({
+        folder: folderPath,
+        format: conversionType,
+        cleanup: removeFile
+      })
+      return '変換完了しました'
+    } catch (error) {
+      if (typeof error === 'object' && error && 'message' in error)
+        return `エラーが発生しました: ${error.message}`
 
-    return error
+      return error
+    }
   }
-})
+)

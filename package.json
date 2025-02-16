@@ -1,7 +1,7 @@
 {
-  "name": "webp-png-converter",
-  "version": "1.2.2",
-  "description": "WebP / PNG image converter",
+  "name": "webpexer",
+  "version": "1.2.3",
+  "description": "image converter",
   "main": "./out/main/index.js",
   "author": "Yuma Shintani",
   "license": "MIT",

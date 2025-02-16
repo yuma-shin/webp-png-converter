@@ -1,5 +1,5 @@
 appId: com.electron.app
-productName: WebP - PNG Converter
+productName: WebPexer
 directories:
   buildResources: build
 files:
@@ -11,12 +11,23 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: webp-png-converter
+  executableName: WebPexer
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - zip
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
+  installerIcon: 'build/icon.ico'
+  uninstallerIcon: 'build/icon.ico'
+  installerHeaderIcon: 'build/icon.ico'
   createDesktopShortcut: always
+  oneClick: true
+  perMachine: false
+  deleteAppDataOnUninstall: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -25,12 +36,12 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
+  icon: 'build/icon.icns'
+  target: zip
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
   target:
-    - AppImage
-    - snap
     - deb
   maintainer: electronjs.org
   category: Utility
