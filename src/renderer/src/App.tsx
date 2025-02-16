@@ -1,7 +1,15 @@
-
 export { Component as App }
 
-import { Button, Typography , Box , Container, Alert, CircularProgress, Radio, RadioGroup, FormControlLabel, FormLabel, FormControl, Select , MenuItem } from '@mui/material';
+import {
+  Button,
+  Typography,
+  Box,
+  Container,
+  Alert,
+  CircularProgress,
+  Select,
+  MenuItem
+} from '@mui/material'
 import { FormatSelector } from '../Components/FormatSelector'
 import { useTranslation } from 'react-i18next'
 import { FolderChooser } from '../Components/FolderChooser'
@@ -10,125 +18,76 @@ import { useState } from 'react'
 
 import '../../preload/Types'
 import './I18n'
-import { CleanupSelector } from '../Components/CleanupSelector';
-
-
+import { CleanupSelector } from '../Components/CleanupSelector'
 
 const { electron } = window
 
+function Component() {
+  const { i18n, t } = useTranslation('Conversion')
 
-function Component (){
+  const [isLoading, setIsLoading] = useState(false)
+  const [message, setMessage] = useState('')
 
-  const { i18n , t } = useTranslation('Conversion')
+  const [format, setFormat] = useState<OutputFormat>('webp')
 
-  const [ isLoading , setIsLoading ] = useState(false)
-  const [ message , setMessage ] = useState('')
+  const [folder, setFolder] = useState<null | string>(null)
 
-  const [ format , setFormat ] =
-    useState<OutputFormat>('webp')
-
-  const [ folder , setFolder ] =
-    useState< null | string >(null)
-
-  const [ cleanup , setCleanup ] =
-    useState(false)
-
+  const [cleanup, setCleanup] = useState(false)
 
   const convertFiles = async () => {
-
-    if( ! folder )
-      return
+    if (!folder) return
 
     setIsLoading(true)
 
-    const result = await electron
-      .convertWebPToPNG(folder,format,cleanup)  // IPC通信
+    const result = await electron.convertWebPToPNG(folder, format, cleanup) // IPC通信
 
     setIsLoading(false)
     setMessage(result)
   }
 
   return (
-    <Container maxWidth = 'sm' >
-
-      <Box sx={{display : "flex", justifyContent : "space-between", alignItems : "center"}} my = { 4 }>
-        
-        <Typography
-            children = { `WebP - PNG Converter` }
-            variant = 'h4'
-          />
+    <Container maxWidth="sm">
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} my={4}>
+        <Typography children={`WebPexer`} variant="h4" />
 
         <Select
-          value = { i18n.language }
-          onChange = { ( event ) => {
-
+          value={i18n.language}
+          onChange={(event) => {
             const language = event.target.value
-
             i18n.changeLanguage(language)
           }}
+          size="small"
         >
+          <MenuItem children={'JP'} value={'jp'} />
 
-          <MenuItem
-            children = { 'JP' }
-            value = { 'jp' }
-          />
-
-          <MenuItem
-            children = { 'EN' }
-            value = { 'en' }
-          />
-
+          <MenuItem children={'EN'} value={'en'} />
         </Select>
       </Box>
 
-      <Box
-        textAlign = 'center'
-        my = { 6 }
-      >
+      <Box textAlign="center" my={6}>
+        <FolderChooser isDisabled={isLoading} onChange={setFolder} value={folder} />
 
-        <FolderChooser
-          isDisabled = { isLoading }
-          onChange = { setFolder }
-          value = { folder }
-        />
+        <Box sx={{ display: 'flex', justifyContent: 'space-around' }} my={2}>
+          <FormatSelector isDisabled={isLoading} onChange={setFormat} value={format} />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-around' }} my = { 2 }>
-
-          <FormatSelector
-            isDisabled = { isLoading }
-            onChange = { setFormat }
-            value = { format }
-          />
-
-          <CleanupSelector
-            isDisabled = { isLoading }
-            onChange = { setCleanup }
-            value = { cleanup }
-          />
-
+          <CleanupSelector isDisabled={isLoading} onChange={setCleanup} value={cleanup} />
         </Box>
 
         <Button
-          children = { t('Convert') }
-          disabled = { isLoading || ! folder }
-          onClick = { convertFiles }
-          variant = 'contained'
-          color = 'secondary'
+          children={t('Convert')}
+          disabled={isLoading || !folder}
+          onClick={convertFiles}
+          variant="contained"
+          color="secondary"
         />
 
-        <Box my = { 2 } >
+        <Box my={2}>
+          {isLoading && <CircularProgress />}
 
-          { isLoading && <CircularProgress /> }
-
-          { ! isLoading && message && (
-            <Alert
-              children = { message }
-              severity = { message.includes('エラー') ? 'error' : 'success' }
-            />
+          {!isLoading && message && (
+            <Alert children={message} severity={message.includes('エラー') ? 'error' : 'success'} />
           )}
-
         </Box>
-
       </Box>
     </Container>
   )
