@@ -1,6 +1,6 @@
 {
   "name": "webpexer",
-  "version": "1.2.3",
+  "version": "1.2.6",
   "description": "image converter",
   "main": "./out/main/index.js",
   "author": "Yuma Shintani",
