@@ -1,10 +1,12 @@
 - [日本語 JP](README_JP.md)
 
-# WebP - PNG Converter
+# WebPexer
 
-![UI](./doc/ui_en.png)
+<img src="./resources/icon.png" width="180" />
 
 This is a tool for converting image files between WebP and PNG formats (mainly for personal use).
+
+![UI](./doc/ui_en.png)
 
 ## Stack
 
